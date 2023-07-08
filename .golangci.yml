@@ -29,8 +29,9 @@ linters:
     - ineffassign # assignments to existing variables are not used (enabled by default)
 #    - rowserrcheck # Err of rows is checked successfully
 #    - sqlclosecheck # sql.Rows and sql.Stmt are closed
+    - staticcheck
     - typecheck # (enabled by default)
-    - unparam # Reports unused function parameters
+    - unparam # reports unused function parameters
     - unused # unused constants, variables, functions and types (enabled by default)
 
 #  disable:
