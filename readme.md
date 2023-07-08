@@ -1,0 +1,1 @@
+`golangci-lint` rules for my projects.
