@@ -23,6 +23,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go_version }}
+          cache: false
 
       - name: Install golangci-lint
         run: |
@@ -60,7 +61,8 @@ jobs:
         working-directory: sample
         run: |
           cp ../.golangci.yml .
-          /tmp/bin/golangci-lint run > lint.out; status=$?
+          status=0
+          /tmp/bin/golangci-lint run > lint.out || status=$?
           cat lint.out
-          [ $status -eq 1 ] || { echo "expected 1 issue"; exit 1; }
+          [ $status -eq 1 ] || { echo "expected 1 issue, got exit $status"; exit 1; }
           grep -q "error-naming" lint.out || { echo "revive rule did not fire"; exit 1; }
