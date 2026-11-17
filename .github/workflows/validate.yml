@@ -15,8 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gc_l_version: ['2.4.0', 'latest']    # golangci-lint: pin + latest
-        go_version: [stable, old-stable]
+        gc_l_version: ['2.14.0', 'latest']
+        go_version: [stable, oldstable]
     steps:
       - uses: actions/checkout@v4
 
