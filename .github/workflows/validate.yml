@@ -28,7 +28,7 @@ jobs:
         run: |
           version="${{ matrix.gc_l_version }}"
           [ "$version" != "latest" ] && version="v$version"
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+          curl -sSfL https://golangci-lint.run/install.sh \
             | sh -s -- -b /tmp/bin "$version"
           /tmp/bin/golangci-lint version
           go version
