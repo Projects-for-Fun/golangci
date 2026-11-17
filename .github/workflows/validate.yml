@@ -1,0 +1,66 @@
+name: Validate config
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: gcl ${{ matrix.gc_l_version }} - go ${{ matrix.go_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        gc_l_version: ['2.4.0', 'latest']    # golangci-lint: pin + latest
+        go_version: [stable, old-stable]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go_version }}
+
+      - name: Install golangci-lint
+        run: |
+          version="${{ matrix.gc_l_version }}"
+          [ "$version" != "latest" ] && version="v$version"
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+            | sh -s -- -b /tmp/bin "$version"
+          /tmp/bin/golangci-lint version
+          go version
+
+      - name: Verify config schema
+        run: /tmp/bin/golangci-lint config verify
+
+      - name: Create sample module with known violations
+        run: |
+          mkdir sample && cd sample
+          go mod init example.com/sample
+          cat > main.go <<'EOF'
+          package main
+
+          import (
+          	"errors"
+          	"fmt"
+          )
+
+          var BadErr = errors.New("bad") // revive error-naming should flag this
+
+          func main() {
+          	x := 1
+          	fmt.Println(x)
+          }
+          EOF
+
+      - name: Run lint, expect the known violation
+        working-directory: sample
+        run: |
+          cp ../.golangci.yml .
+          /tmp/bin/golangci-lint run > lint.out; status=$?
+          cat lint.out
+          [ $status -eq 1 ] || { echo "expected 1 issue"; exit 1; }
+          grep -q "error-naming" lint.out || { echo "revive rule did not fire"; exit 1; }
