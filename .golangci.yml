@@ -1,6 +1,4 @@
 # golangci-lint v2 configuration format.
-# Note: no `run.go` equivalent in v2; the target Go version is taken from
-# the `go` directive / toolchain line in go.mod.
 # Validate with: golangci-lint config verify
 version: "2"
 
